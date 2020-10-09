@@ -9,8 +9,8 @@ TODO:
 - [ ] ch4 
 - [X] ch5 
 - [X] ch6 
-- [ ] ch7 
-- [ ] ch8 
+- [X] ch7 
+- [X] ch8 
 - [ ] ch9 
 - [ ] ch10 
 - [ ] ch11 

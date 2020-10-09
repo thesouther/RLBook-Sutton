@@ -1,78 +1,39 @@
-# Character 6
+# Character 7
 
-## 6.1
+## 7.1
 
-由$V_{t+1}(S_t) \leftarrow V_t(S_t)+\alpha [R_{t+1} +\gamma V_t(S_{t+1})-V_t(S_t)]$，
+由（6.6），$\delta_t = R_{t+1}+\gamma V(S_{t+1})-V(S_t)$
 
-$\delta_t = R_{t+1}+\gamma V_t(S_{t+1})-V_t(S_t)$
+这里，$V_{t+n}(S_t) \leftarrow V_{t+n-1}(S_t)+\alpha [G_{t:t+n}-V_{t+n-1}(S_t)]$，
 
-令$\mu_{t}=\alpha [R_{t+1} +\gamma V_t(S_{t+1})-V_t(S_{t})]$
+此处误差使用，$G_{t:t+n}-V_{t+n-1}(S_t)$
 
-得，
+因为假设V是不变的，所以
 
-$$
-\begin{aligned}
-    G_t-V_t(S_t) &= R_{t+1} + \gamma G_{t+1} - V_t(S_t) + \gamma V_t(S_{t+1}) - \gamma V_t(S_{t+1}) \\
-    & = \delta_t + \gamma(G_{t+1}-V_t(S_{t+1})) \\
-    & = \delta_t + \gamma(G_{t+1}-V_{t}(S_{t+1}) + \mu_{t+1}) -\gamma\mu_{t+1} \\
-    & = \delta_t + \gamma(G_{t+1}-V_{t+1}(S_{t+1})) - \gamma \mu_{t+1} \\
-    & = \delta_t +\gamma\delta_{t+1} + \gamma^2(G_{t+2}-V_{t+2}(S_{t+2})) + \gamma \mu_{t+1} +\gamma^2 \mu_{t+2}\\
-    & ... \\
-    & = \sum_{k=t}^{T-1}\left[\gamma^{k-t}\delta_{k} + \gamma^{k-t+1}\mu_{k+1} \right]
-\end{aligned}
-$$
+![](img/2020-10-08-16-54-57.png)
 
-由上，需要额外加的一项是$\sum_{k=t}^{T-1} \gamma^{k-t+1}\mu_{k+1}$
+## 7.2
 
-## 6.2
+见code部分
 
+## 7.3
 
-## 6.3
+使用19个状态的随机游走任务，是为了防止任务过早结束。如果状态数太少，那么很有可能在小于n的步骤内结束，之后的G都不变，这样对比不准确。
 
+## 7.4
 
+[https://github.com/LyWangPX/Reinforcement-Learning-2nd-Edition-by-Sutton-Exercise-Solutions](https://github.com/LyWangPX/Reinforcement-Learning-2nd-Edition-by-Sutton-Exercise-Solutions)
 
-## 6.4
+![](img/2020-10-08-17-33-43.png)
+![](img/2020-10-08-17-33-56.png)
 
+## 7.5
 
+[https://github.com/LyWangPX/Reinforcement-Learning-2nd-Edition-by-Sutton-Exercise-Solutions](https://github.com/LyWangPX/Reinforcement-Learning-2nd-Edition-by-Sutton-Exercise-Solutions)
 
-## 6.6
+![](img/2020-10-08-19-20-04.png)
 
+## 7.7-7.11
 
-
-## 6.6
-
-
-
-## 6.7
-
-
-
-## 6.8
-
-
-
-## 6.9
-
-
-
-## 6.10
-
-
-
-## 6.11
-
-
-## 6.12
-
-
-
-## 6.13
-
-
-
-## 6.14
-
-
-
-## 6.16
+[https://github.com/LyWangPX/Reinforcement-Learning-2nd-Edition-by-Sutton-Exercise-Solutions](https://github.com/LyWangPX/Reinforcement-Learning-2nd-Edition-by-Sutton-Exercise-Solutions)
 
