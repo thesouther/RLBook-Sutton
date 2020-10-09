@@ -1,4 +1,5 @@
 import numpy as np
+import os
 
 PLAYERS = ['x', 'o']
 
@@ -6,10 +7,10 @@ PLAYERS = ['x', 'o']
 class TicTacToe:
     def __init__(self, board_size):
         self.board_size = board_size
-        self.board = self.new_board()
+        self.board = self._new_board()
 
     def reset(self):
-        self.board = self.new_board()
+        self.board = self._new_board()
 
     def step(self):
         s, a, r, s_ = [], [], [], []
