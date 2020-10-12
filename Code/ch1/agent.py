@@ -2,8 +2,8 @@ import numpy as np
 
 
 class RandomAgent:
-    def __init__(self, player='x'):
-        self.player = player
+    def __init__(self, owner='x'):
+        self.owner = owner
 
     def choose_action(self, s, avail_acts, action_space):
         return np.random.choice(avail_acts)
@@ -13,8 +13,8 @@ class RandomAgent:
 
 
 class RLAgent:
-    def __init__(self, player='o'):
-        self.player = player
+    def __init__(self, owner='o'):
+        self.owner = owner
 
     def choose_action(self, env):
         pass
@@ -24,5 +24,5 @@ class RLAgent:
 
 
 class HumanPlayer:
-    def __init__(self, player='x'):
-        self.player = player
+    def __init__(self, owner='x'):
+        self.owner = owner
