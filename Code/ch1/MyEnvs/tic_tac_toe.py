@@ -1,71 +1,133 @@
 import numpy as np
 import os, sys
 import time
+from agent import RandomAgent
 
 PLAYERS = ['x', 'o']
 
 
 class TicTacToe:
-    def __init__(self, board_size=3):
+    def __init__(self, board_size=3, agent_first=False, inner_player=None):
         """
-        初始换棋盘参数。
+        'x' first, 'o' second
         """
         self.board_size = board_size
         self.player1 = PLAYERS[0]
         self.player2 = PLAYERS[1]
-        self._new_board()
         self.actions = np.array([[i // self.board_size, i % self.board_size]
                                  for i in range(self.board_size *
                                                 self.board_size)])
         self.action_space = [i for i in range(len(self.actions))]
+        self.agent_first = agent_first
+        self.inner_player = inner_player
+
+        if self.inner_player is None:
+            self._init_inner_player()
+
+        self._new_board()
+
+    def _init_inner_player(self):
+        if self.agent_first:
+            random_agent = RandomAgent(owner='o')
+        else:
+            random_agent = RandomAgent(owner='x')
+        self.inner_player = random_agent
 
     def _new_board(self):
         self.curr_player = self.player1
         self.terminal = False
         self.board = [['.' for _ in range(self.board_size)]
                       for _ in range(self.board_size)]
+        if not self.agent_first:
+            self.inner_player_go(self.get_state())
+
+    def inner_player_go(self, s):
+        avail_acts = self.get_available_actions()
+        action_space = self.action_space
+        a = self.inner_player.best_action(s, avail_acts, action_space)
+        s_ = self.move(a)
+        return s_
+
+    def move(self, a):
+        """
+        go play and exchange current player.
+        """
+        if not self.terminal and a in self.get_available_actions():
+            x, y = self.actions[a]
+            self.board[x][y] = self.curr_player
+            # exchange current player
+            self.curr_player = self.get_opposite(self.curr_player)
+            return self.board
+
+    def check_win_tag(self, check_agent=True):
+        win_tag = {"win": None}
+        if check_agent:
+            if self.has_won(self.curr_player):
+                win_tag["win"] = "agent"
+            elif self.has_won(self.get_opposite(self.curr_player)):
+                win_tag["win"] = "inner_player"
+            else:
+                win_tag["win"] = "draw"
+            r = self.get_reward(self.curr_player)
+        else:
+            if self.has_won(self.curr_player):
+                win_tag["win"] = "inner_player"
+            elif self.has_won(self.get_opposite(self.curr_player)):
+                win_tag["win"] = "agent"
+            else:
+                win_tag["win"] = "draw"
+            r = self.get_reward(self.get_opposite(self.curr_player))
+        self.terminal = True
+        return win_tag, r
 
     def step(self, a):
         """
-        进行一步走棋， 之后交换下棋方
+        go one step and exchange current player.
         """
-        if self.terminal:
+        if self.terminal and a not in self.get_available_actions():
             exit("please reset your environment!")
         s_, r, = [], 0
         win_tag = {"win": None}
-        # 下棋
-        x, y = self.actions[a]
-        self.board[x][y] = self.curr_player
-        # 判断是否赢棋或者结束
+        sa = self.move(a)
+        # one player has won or the game has ended.
         if self.is_end():
-            self.terminal = True
-            if self.has_won(self.curr_player):
-                win_tag["win"] = self.curr_player
-            elif self.has_won(self.get_opposite(self.curr_player)):
-                win_tag["win"] = self.get_opposite(self.curr_player)
-            else:
-                win_tag["win"] = None
-        r = self.get_reward()
-        s_ = self.board
-        # 交换下棋方
-        self.curr_player = self.get_opposite(self.curr_player)
+            win_tag, r = self.check_win_tag(check_agent=True)
+            return sa, r, self.terminal, win_tag
+        # not end inner player goone step.
+        s_ = self.inner_player_go(sa)
+        if self.is_end():
+            win_tag, r = self.check_win_tag(check_agent=False)
+            return s_, r, self.terminal, win_tag
+        r = self.get_reward(self.curr_player)
         return s_, r, self.terminal, win_tag
 
-    def get_reward(self):
-        if self.has_won(self.curr_player):
+    def un_move(self, a):
+        x, y = self.actions[a]
+        self.board[x][y] = '.'
+        self.curr_player = self.get_opposite(self.curr_player)
+        self.terminal = False
+
+    def get_reward(self, player):
+        """
+        get current player's reward
+        """
+        if self.has_won(player):
             return 1
-        elif self.has_won(self.get_opposite(self.curr_player)):
-            return 0
+        elif self.has_won(self.get_opposite(player)):
+            return -1
         else:
-            return 0.5
+            return 0
 
     def get_opposite(self, player):
+        """
+        get opposite player
+        """
         opposite = PLAYERS[0] if player == PLAYERS[1] else PLAYERS[1]
         return opposite
 
     def has_won(self, player):
         """
-        检查行、列、两个对角是否相同
+        check rows, columns and diagonal lines
         """
         board_size = self.board_size
         b = self.board
@@ -93,7 +155,7 @@ class TicTacToe:
         return 0 <= x < self.board_size and 0 <= y < self.board_size and self.board[
             x][y] == '.'
 
-    def available_actions(self):
+    def get_available_actions(self):
         avail_act = []
         for a in self.action_space:
             if self.is_legal_move(a):
@@ -103,15 +165,19 @@ class TicTacToe:
     def sample_action(self):
         if self.terminal:
             exit("please reset your environment!")
-        avail_acts = self.available_actions()
+        avail_acts = self.get_available_actions()
         return np.random.choice(avail_acts)
 
     def get_state(self):
         return self.board
 
+    def get_q_id(self, s):
+        return "".join([''.join(row) for row in s])
+
     def render(self):
         board = '\n'.join([' '.join(row) for row in self.board])
         print("{}".format(board))
+        print()
 
     def reset(self):
         self._new_board()
