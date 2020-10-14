@@ -25,6 +25,7 @@ class TicTacToe:
             self._init_inner_player()
 
         self._new_board()
+        self.agent_owner = self.get_opposite(self.inner_player.owner)
 
     def _init_inner_player(self):
         if self.agent_first:
@@ -61,24 +62,15 @@ class TicTacToe:
 
     def check_win_tag(self, check_agent=True):
         win_tag = {"win": None}
-        if check_agent:
-            if self.has_won(self.curr_player):
-                win_tag["win"] = "agent"
-            elif self.has_won(self.get_opposite(self.curr_player)):
-                win_tag["win"] = "inner_player"
-            else:
-                win_tag["win"] = "draw"
-            r = self.get_reward(self.curr_player)
+        if self.has_won(self.agent_owner):
+            win_tag["win"] = "agent"
+        elif self.has_won(self.get_opposite(self.agent_owner)):
+            win_tag["win"] = "inner_player"
         else:
-            if self.has_won(self.curr_player):
-                win_tag["win"] = "inner_player"
-            elif self.has_won(self.get_opposite(self.curr_player)):
-                win_tag["win"] = "agent"
-            else:
-                win_tag["win"] = "draw"
-            r = self.get_reward(self.get_opposite(self.curr_player))
+            win_tag["win"] = "draw"
+
         self.terminal = True
-        return win_tag, r
+        return win_tag
 
     def step(self, a):
         """
